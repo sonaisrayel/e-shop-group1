@@ -6,6 +6,7 @@
     "type": "module",
     "scripts": {
         "start": "node src/index.js",
+        "dev": "nodemon src/index.js",
         "prettier": "prettier '**/*.{js,json,yml}' --write",
         "lint": "eslint -c .eslintrc --ext .js .",
         "lint:fix": "npm run lint -- --fix"
