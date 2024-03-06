@@ -20,7 +20,7 @@ app.use('/bucket', bucketsRouter);
 app.use('/favorites', favoritesRouter);
 app.use('/orders', ordersRouter);
 app.use('/products', productsRouter);
-app.use('/users', usersRouter);
+app.use('/auth', usersRouter);
 
 connection();
 
