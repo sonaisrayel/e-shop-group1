@@ -37,3 +37,19 @@ export const getProduct = async (req, res) => {
         throw new Error('Something went wrong');
     }
 };
+
+export const deleteProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedProduct = await Product.findByIdAndDelete(id);
+        if (!deletedProduct) {
+            res.status(404).send("Product not found");
+            return
+        }
+        res.status(201).send({ data: deletedProduct })
+    }
+    catch (e) {
+        console.log(e)
+        throw new Error("Something went wrong")
+    }
+}
