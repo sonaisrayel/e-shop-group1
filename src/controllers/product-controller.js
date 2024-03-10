@@ -15,7 +15,7 @@ export const getProducts = async (req, res) => {
     try {
         const products = await Product.find();
         if (!products.length) {
-            return res.status(404).send(e.message);
+            return res.status(404).send("Product not found");
         }
 
         res.status(201).send({ data: products });
@@ -29,7 +29,7 @@ export const getProduct = async (req, res) => {
         const { id } = req.params;
         const product = await Product.findById(id);
         if (!product) {
-            res.status(404).send(e.message);
+            res.status(404).send("Product not found");
             return;
         }
         res.status(201).send({ data: product });
@@ -43,12 +43,11 @@ export const deleteProduct = async (req, res) => {
         const { id } = req.params;
         const deletedProduct = await Product.findByIdAndDelete(id);
         if (!deletedProduct) {
-            res.status(404).send('Product not found');
+            res.status(404).send("Product not found");
             return;
         }
         res.status(201).send({ data: deletedProduct });
     } catch (e) {
-        console.log(e);
-        throw new Error('Something went wrong');
+        throw new Error(e.message);
     }
 };
