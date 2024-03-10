@@ -29,13 +29,12 @@ export const getProduct = async (req, res) => {
         const { id } = req.params;
         const product = await Product.findById(id);
         if (!product) {
-            res.status(404).send('Product not found');
+            res.status(404).send(e.message);
             return;
         }
         res.status(201).send({ data: product });
     } catch (e) {
-        console.log(e.message);
-        throw new Error('Something went wrong');
+        throw new Error(e.message);
     }
 };
 
