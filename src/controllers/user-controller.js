@@ -1,15 +1,45 @@
+import { User } from '../models/user-model.js';
+import CryptoLib from '../libs/crypto-lib.js';
+import { userValidationSchema } from '../utils/validations.js';
+
 export const register = async (req, res) => {
-    const { firstname, lastname, email, password, rePassword, userType } = req.body;
+    try {
+        const { firstname, lastname, email, password, rePassword, userType } = req.body;
 
-    console.log(firstname, lastname, email, password, rePassword, userType);
+        await userValidationSchema.validateAsync({
+            firstname,
+            lastname,
+            email,
+            password,
+            rePassword,
+        });
 
-    res.status(202).send({ message: 'ok' });
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            throw new Error('Duplicate Email');
+        }
+
+        const hashedPassword = await CryptoLib.makeHashedPassword(password);
+
+        const user = await User.create({ firstname, lastname, email, password: hashedPassword, userType });
+
+        res.status(201).send({ message: 'User is created.', user });
+    } catch (error) {
+        res.status(404).send({ message: error.message });
+    }
 };
 
 export const login = async (req, res) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    console.log(email, password);
+        console.log(email, password);
 
-    res.status(202).send({ message: 'ok' });
+        CryptoLib.compareHashedPassword(password);
+
+        res.status(200).send({ message: 'ok' });
+    } catch (error) {
+        console.log(error);
+    }
 };
