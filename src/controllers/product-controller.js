@@ -43,13 +43,12 @@ export const deleteProduct = async (req, res) => {
         const { id } = req.params;
         const deletedProduct = await Product.findByIdAndDelete(id);
         if (!deletedProduct) {
-            res.status(404).send("Product not found");
-            return
+            res.status(404).send('Product not found');
+            return;
         }
-        res.status(201).send({ data: deletedProduct })
+        res.status(201).send({ data: deletedProduct });
+    } catch (e) {
+        console.log(e);
+        throw new Error('Something went wrong');
     }
-    catch (e) {
-        console.log(e)
-        throw new Error("Something went wrong")
-    }
-}
+};
