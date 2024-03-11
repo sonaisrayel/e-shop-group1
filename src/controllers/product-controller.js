@@ -7,7 +7,7 @@ export const createProduct = async (req, res) => {
         await newProduct.save();
         res.status(201).send({ data: newProduct });
     } catch (e) {
-        throw new Error(e.message);
+        res.status(404).send({message: e.message});
     }
 };
 
@@ -15,12 +15,13 @@ export const getProducts = async (req, res) => {
     try {
         const products = await Product.find();
         if (!products.length) {
-            return res.status(404).send("Product not found");
+            throw new Error("Product not found");
         }
 
         res.status(201).send({ data: products });
     } catch (e) {
-        throw new Error(e.message);
+        res.status(404).send({message: e.message});
+
     }
 };
 
@@ -29,12 +30,11 @@ export const getProduct = async (req, res) => {
         const { id } = req.params;
         const product = await Product.findById(id);
         if (!product) {
-            res.status(404).send("Product not found");
-            return;
+            throw new Error("Product not found")
         }
         res.status(201).send({ data: product });
     } catch (e) {
-        throw new Error(e.message);
+        res.status(404).send({message: e.message});
     }
 };
 
@@ -43,11 +43,10 @@ export const deleteProduct = async (req, res) => {
         const { id } = req.params;
         const deletedProduct = await Product.findByIdAndDelete(id);
         if (!deletedProduct) {
-            res.status(404).send("Product not found");
-            return;
+            throw new Error("Product not found");
         }
         res.status(201).send({ data: deletedProduct });
     } catch (e) {
-        throw new Error(e.message);
+        res.status(404).send({message:e.message});
     }
 };
