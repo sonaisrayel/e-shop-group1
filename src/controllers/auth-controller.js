@@ -23,9 +23,12 @@ export const register = async (req, res) => {
 
         const hashedPassword = await CryptoLib.makeHashedPassword(password);
 
-        const user = await User.create({ firstname, lastname, email, password: hashedPassword, userType });
+        const user = new User({ firstname, lastname, email, password: hashedPassword, userType });
+        await user.save();
 
-        res.status(201).send({ message: 'User is created.', user });
+        const registeredUser = await User.find({ email }).select('-password');
+
+        res.status(201).send({ message: 'User is created.', user: registeredUser });
     } catch (error) {
         res.status(404).send({ message: error.message });
     }
