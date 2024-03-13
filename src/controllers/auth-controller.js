@@ -60,7 +60,13 @@ export const login = async (req, res) => {
 
         res.status(200).send({
             message: 'The user is logged in.',
-            data: { firstname: user.firstname, lastname: user.lastname, email: user.email, userType: user.userType },
+            data: {
+                id: user._id,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+                userType: user.userType,
+            },
             token,
         });
     } catch (error) {
