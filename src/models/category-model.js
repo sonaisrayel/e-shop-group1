@@ -14,8 +14,9 @@ const bookCategories = [
   ];
   
   
-  const mongoose = require('mongoose');
-  
+  import mongoose from 'mongoose';
+  const Schema = mongoose.Schema;
+
   const categorySchema = new mongoose.Schema({
     name:{type:String, 
           isDiscounted:false, 
