@@ -17,12 +17,12 @@ export const register = async (req, res) => {
         const existingEmail = await User.findOne({ email });
         const existingUsername = await User.findOne({ username });
 
-        if (existingEmail) {
-            throw new Error('Duplicate Email');
-        }
-
         if (existingUsername) {
             throw new Error('Duplicate Username');
+        }
+
+        if (existingEmail) {
+            throw new Error('Duplicate Email');
         }
 
         const hashedPassword = await CryptoLib.makeHashedPassword(password);

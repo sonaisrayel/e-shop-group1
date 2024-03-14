@@ -19,6 +19,8 @@ const userSchema = new Schema({
     },
     userType: {
         type: String,
+        enum: ['buyer', 'seller', 'admin'],
+        default: 'buyer',
     },
     pictureUrl: {
         type: String,
