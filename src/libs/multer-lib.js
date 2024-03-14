@@ -5,8 +5,8 @@ const storage = Multer.diskStorage({
         cb(null, 'assets/');
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
+        cb(null, `${Date.now()}-${file.originalname}`);
     },
 });
 
-export const upload = Multer({ storage: storage });
+export const upload = Multer({ storage });
