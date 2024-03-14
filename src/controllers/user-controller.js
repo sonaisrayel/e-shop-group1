@@ -12,19 +12,37 @@ export const addUserImage = async (req, res) => {
     }
 };
 
-export const getUser = (req, res) => {
+export const getUser = async (req, res) => {
     try {
-        const { id } = req.body;
+        const { id } = req.params;
 
-        res.status(201).send({ message: 'ok' });
+        const user = await User.findById(id).select('-password');
+
+        res.status(200).send({ message: 'ok', data: user });
     } catch (error) {
-        res.status(404).send({ message: error });
+        res.status(404).send({ message: error.message });
+    }
+};
+
+export const getUsers = async (req, res) => {
+    try {
+        const { userType } = req.userInfo;
+
+        if (userType !== 'admin') throw new Error('You are not authorized');
+
+        const buyers = await User.find({ userType: 'buyer' }).select('-password');
+        const sellers = await User.find({ userType: 'seller' }).select('-password');
+
+        res.status(201).send({ message: 'ok', buyers, sellers });
+    } catch (error) {
+        res.status(404).send({ message: error.message });
     }
 };
 
 export const updateUser = (req, res) => {
     try {
         const { id } = req.body;
+
         res.status(201).send({ message: 'ok' });
     } catch (error) {
         res.status(404).send({ message: error });
