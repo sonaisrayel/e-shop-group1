@@ -7,3 +7,8 @@ export const userValidationSchema = Joi.object({
     password: Joi.string().pattern(new RegExp(regularExpression)),
     rePassword: Joi.ref('password'),
 }).with('password', 'rePassword');
+
+export const passwordValidationSchema = Joi.object({
+    newPassword: Joi.string().pattern(new RegExp(regularExpression)),
+    reNewPassword: Joi.ref('newPassword'),
+}).with('newPassword', 'reNewPassword');
