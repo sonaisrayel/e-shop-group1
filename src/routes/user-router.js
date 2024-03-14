@@ -7,7 +7,7 @@ import { addUserImage, getUser, getUsers, updateUser } from '../controllers/user
 
 router.get('/', getUsers);
 router.get('/:id', getUser);
-router.patch('/:id', updateUser);
+router.patch('/:id', upload.single('file'), updateUser);
 router.post('/:id/image', upload.single('file'), addUserImage);
 
 export default router;

@@ -1,4 +1,6 @@
 import { User } from '../models/user-model.js';
+import CryptoLib from '../libs/crypto-lib.js';
+import { passwordValidationSchema } from '../utils/validations.js';
 
 export const addUserImage = async (req, res) => {
     try {
@@ -28,7 +30,9 @@ export const getUsers = async (req, res) => {
     try {
         const { userType } = req.userInfo;
 
-        if (userType !== 'admin') throw new Error('You are not authorized');
+        if (userType !== 'admin') {
+            throw new Error('You are not authorized');
+        }
 
         const buyers = await User.find({ userType: 'buyer' }).select('-password');
         const sellers = await User.find({ userType: 'seller' }).select('-password');
@@ -39,12 +43,38 @@ export const getUsers = async (req, res) => {
     }
 };
 
-export const updateUser = (req, res) => {
+export const updateUser = async (req, res) => {
     try {
-        const { id } = req.body;
+        const { id } = req.params;
+        const { oldPassword, newPassword, reNewPassword } = req.body;
 
-        res.status(201).send({ message: 'ok' });
+        let updatedUser = null;
+
+        if (oldPassword) {
+            const user = await User.findOne({ _id: id });
+
+            const isPasswordCorrect = await CryptoLib.compareHashedPassword(oldPassword, user.password);
+
+            if (!isPasswordCorrect) {
+                throw new Error('Wrong password');
+            }
+
+            await passwordValidationSchema.validateAsync({
+                newPassword,
+                reNewPassword,
+            });
+
+            const hashedPassword = await CryptoLib.makeHashedPassword(newPassword);
+
+            updatedUser = await User.findOneAndUpdate({ _id: id }, { password: hashedPassword }, { new: true });
+        }
+
+        if (req.file) {
+            updatedUser = await User.findOneAndUpdate({ _id: id }, { pictureUrl: req.file.path }, { new: true });
+        }
+
+        res.status(201).send({ message: 'ok', data: updatedUser });
     } catch (error) {
-        res.status(404).send({ message: error });
+        res.status(404).send({ message: error.message });
     }
 };
