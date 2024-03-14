@@ -1,6 +1,6 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const Category = require('./category-model');
+import express from 'express';
+import mongoose from 'mongoose';
+import { Category } from '../models/category-model.js';
 
 const app = express();
 const PORT = 3000; 
