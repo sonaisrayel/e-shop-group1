@@ -5,25 +5,29 @@ import { userValidationSchema } from '../utils/validations.js';
 
 export const register = async (req, res) => {
     try {
-        const { firstname, lastname, email, password, rePassword, userType } = req.body;
+        const { username, email, password, rePassword, userType } = req.body;
 
         await userValidationSchema.validateAsync({
-            firstname,
-            lastname,
+            username,
             email,
             password,
             rePassword,
         });
 
-        const existingUser = await User.findOne({ email });
+        const existingEmail = await User.findOne({ email });
+        const existingUsername = await User.findOne({ username });
 
-        if (existingUser) {
+        if (existingUsername) {
+            throw new Error('Duplicate Username');
+        }
+
+        if (existingEmail) {
             throw new Error('Duplicate Email');
         }
 
         const hashedPassword = await CryptoLib.makeHashedPassword(password);
 
-        const user = new User({ firstname, lastname, email, password: hashedPassword, userType });
+        const user = new User({ username, email, password: hashedPassword, userType });
         await user.save();
 
         const registeredUser = await User.find({ email }).select('-password');
@@ -52,8 +56,7 @@ export const login = async (req, res) => {
 
         const token = await JWT.createToken({
             id: user._id,
-            firstname: user.firstname,
-            lastname: user.lastname,
+            username: user.username,
             email: user.email,
             userType: user.userType,
         });
@@ -62,8 +65,7 @@ export const login = async (req, res) => {
             message: 'The user is logged in.',
             data: {
                 id: user._id,
-                firstname: user.firstname,
-                lastname: user.lastname,
+                username: user.username,
                 email: user.email,
                 userType: user.userType,
             },
