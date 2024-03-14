@@ -3,15 +3,10 @@ import mongoose from 'mongoose';
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
-    firstname: {
+    username: {
         type: String,
         required: true,
-        unique: false,
-    },
-    lastname: {
-        type: String,
-        required: true,
-        unique: false,
+        unique: true,
     },
     email: {
         type: String,
