@@ -4,6 +4,20 @@ const regularExpression = '^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}
 export const userValidationSchema = Joi.object({
     username: Joi.string().alphanum().min(3).max(30).required(),
     email: Joi.string().email(),
+    address1: Joi.string().required(),
+    address2: Joi.string(),
+    city: Joi.string(),
+    country: Joi.string().alphanum().required(),
+    mobile: Joi.string()
+        .length(8)
+        .pattern(/^[0-9]+$/)
+        .required(),
+    cardNumber: Joi.string()
+        .length(16)
+        .pattern(/^[0-9]+$/)
+        .required(),
+    cardExpitarionDate: Joi.string().required(),
+    cardOwnerName: Joi.string().required(),
     password: Joi.string().pattern(new RegExp(regularExpression)),
     rePassword: Joi.ref('password'),
 }).with('password', 'rePassword');

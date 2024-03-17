@@ -1,5 +1,4 @@
 import { Category } from '../models/category-model.js';
-import JWT from '../libs/jwt-lib.js';
 
 export const getCategories = async (req, res) => {
     try {
