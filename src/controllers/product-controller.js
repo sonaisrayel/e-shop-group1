@@ -4,7 +4,7 @@ export const createProduct = async (req, res) => {
     try {
         const { userInfo } = req;
         const { name, price, seller, description, category } = req.body;
-        if (!userInfo || userInfo.userType !== 'seller') {
+        if (!userInfo || userInfo.role !== 'seller') {
             throw new Error('Only sellers are authorized to create products');
         }
         const newProduct = new Product({ name, price, seller, description, category });

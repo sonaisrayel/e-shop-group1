@@ -11,7 +11,7 @@ export const adminLogin = async (req, res) => {
             throw new Error('You are not an admin!!!');
         }
 
-        const token = await JWT.createToken({ username, userType: 'admin' });
+        const token = await JWT.createToken({ username, role: 'admin' });
 
         res.status(200).send({ message: 'ok', token });
     } catch (error) {

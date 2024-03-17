@@ -27,7 +27,7 @@ export const createCategory = async (req, res) => {
         const { name } = req.body;
         const { userInfo } = req;
 
-        if (userInfo.userType !== 'admin') {
+        if (userInfo.role !== 'admin') {
             throw new Error('Only an admin can add a new Category');
         }
 
