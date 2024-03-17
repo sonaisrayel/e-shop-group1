@@ -5,13 +5,35 @@ import { userValidationSchema } from '../utils/validations.js';
 
 export const register = async (req, res) => {
     try {
-        const { username, email, password, rePassword, role } = req.body;
+        const {
+            username,
+            email,
+            password,
+            rePassword,
+            role,
+            address1,
+            address2,
+            city,
+            country,
+            mobile,
+            cardNumber,
+            cardExpitarionDate,
+            cardOwnerName,
+        } = req.body;
 
         await userValidationSchema.validateAsync({
             username,
             email,
             password,
             rePassword,
+            address1,
+            address2,
+            city,
+            country,
+            mobile,
+            cardNumber,
+            cardExpitarionDate,
+            cardOwnerName,
         });
 
         const existingEmail = await User.findOne({ email });
@@ -26,8 +48,23 @@ export const register = async (req, res) => {
         }
 
         const hashedPassword = await CryptoLib.makeHashedPassword(password);
+        const date = cardExpitarionDate.split('/');
+        const cardDate = `20${date[1]}-${date[0]}-01`;
 
-        const user = new User({ username, email, password: hashedPassword, role });
+        const user = new User({
+            username,
+            email,
+            password: hashedPassword,
+            role,
+            address1,
+            address2,
+            city,
+            country,
+            mobile,
+            cardNumber,
+            cardExpitarionDate: cardDate,
+            cardOwnerName,
+        });
         await user.save();
 
         const registeredUser = await User.find({ email }).select('-password');

@@ -25,6 +25,37 @@ const userSchema = new Schema({
     pictureUrl: {
         type: String,
     },
+    address1: {
+        type: String,
+        required: true,
+    },
+    address2: {
+        type: String,
+    },
+    city: {
+        type: String,
+        required: true,
+    },
+    country: {
+        type: String,
+        required: true,
+    },
+    mobile: {
+        type: Number,
+        required: true,
+    },
+    cardNumber: {
+        type: Number,
+        required: true,
+    },
+    cardExpitarionDate: {
+        type: Date,
+        required: true,
+    },
+    cardOwnerName: {
+        type: String,
+        required: true,
+    },
 });
 
 export const User = model('User', userSchema);
