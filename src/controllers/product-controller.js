@@ -43,8 +43,14 @@ export const getProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
     try {
+        const { userInfo } = req;
         const { id } = req.params;
-        const deletedProduct = await Product.findByIdAndDelete(id);
+        if (!userInfo || (userInfo.role !== 'seller' && userInfo.role !== 'admin')) {
+            throw new Error('You are not authorized to delete products');
+        }
+
+        const deletedProduct = await Product.findOneAndDelete({ _id: id, contributor: userInfo._id });
+
         if (!deletedProduct) {
             throw new Error('Product not found');
         }
@@ -60,7 +66,7 @@ export const updateProduct = async (req, res) => {
         const { id } = req.params;
         const payload = req.body;
         if (!userInfo || userInfo.role !== 'seller') {
-            throw new Error('Only sellers are authorized to update products');
+            throw new Error('You are not authorized to update products');
         }
         const updatedProduct = await Product.findOneAndUpdate({ _id: id, contributor: userInfo._id }, payload, {
             new: true,
