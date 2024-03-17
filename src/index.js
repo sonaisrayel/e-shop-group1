@@ -16,10 +16,12 @@ import ordersRouter from '../src/routes/order-router.js';
 import productsRouter from '../src/routes/product-router.js';
 import usersRouter from '../src/routes/user-router.js';
 import authRouter from '../src/routes/auth-router.js';
+import adminRouter from '../src/routes/admin-router.js';
 
 app.use(express.json());
 
 app.use('/auth', authRouter);
+app.use('/admin', adminRouter);
 
 app.use(isAuthorized);
 
