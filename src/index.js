@@ -25,7 +25,7 @@ app.use('/admin', adminRouter);
 
 app.use(isAuthorized);
 
-app.use('/category', categoriesRouter);
+app.use('/categories', categoriesRouter);
 app.use('/bucket', bucketsRouter);
 app.use('/favorites', favoritesRouter);
 app.use('/orders', ordersRouter);
