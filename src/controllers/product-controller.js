@@ -57,13 +57,14 @@ export const deleteProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const { userInfo } = req;
-        console.log(userInfo, 'userinfo');
         const { id } = req.params;
         const payload = req.body;
-        const updatedProduct = await Product.findOneAndUpdate({ _id: id, contributor: userInfo.id }, payload, {
+        if (!userInfo || userInfo.role !== 'seller') {
+            throw new Error('Only sellers are authorized to update products');
+        }
+        const updatedProduct = await Product.findOneAndUpdate({ _id: id, contributor: userInfo._id }, payload, {
             new: true,
         });
-        const product = await Product.findById(id);
         if (!updatedProduct) {
             throw new Error('Unable to update product: You may not have permission or the product does not exist');
         }
