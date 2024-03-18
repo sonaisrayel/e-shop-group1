@@ -22,6 +22,10 @@ const productSchema = new Schema({
     description: {
         type: String,
     },
+    author: {
+        type: String,
+        required: true,
+    },
 });
 
 const Product = mongoose.model('Product', productSchema);
