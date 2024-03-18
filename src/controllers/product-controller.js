@@ -17,7 +17,11 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        const { limit, skip } = req.query;
+        const [products, totalDocuments] = await Promise.all([
+            Product.find({}).limit(limit).skip(skip),
+            Product.countDocuments({}),
+        ]);
         if (!products.length) {
             throw new Error('Product not found');
         }
