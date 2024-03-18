@@ -41,7 +41,6 @@ export const getFavorites = async (req, res) => {
 export const addFavoriteProduct = async (req, res) => {
     const { productId } = req.body;
 
-    console.log(req.userInfo)
     const userId = req.userInfo.id;
     try {
         const favoriteData = await Favorites.findOneAndUpdate(

@@ -1,4 +1,5 @@
 import { User } from '../models/user-model.js';
+import { Favorites } from '../models/favorites-model.js';
 import CryptoLib from '../libs/crypto-lib.js';
 import JWT from '../libs/jwt-lib.js';
 import { userValidationSchema } from '../utils/validations.js';
@@ -65,9 +66,19 @@ export const register = async (req, res) => {
             cardExpitarionDate: cardDate,
             cardOwnerName,
         });
+
         await user.save();
 
-        const registeredUser = await User.find({ email }).select('-password');
+        const [registeredUser] = await User.find({ email }).select('-password');
+
+        if (registeredUser.role === 'buyer') {
+            const favoriteData = new Favorites({
+                userId: registeredUser._id,
+                products: [],
+            });
+
+            await favoriteData.save();
+        }
 
         res.status(201).send({ message: 'User is created.', user: registeredUser });
     } catch (error) {
