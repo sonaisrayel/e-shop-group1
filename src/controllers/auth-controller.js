@@ -120,6 +120,6 @@ export const login = async (req, res) => {
             token,
         });
     } catch (error) {
-        console.log(error);
+        res.status(404).send({ message: error.message });
     }
 };
