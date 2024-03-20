@@ -2,9 +2,18 @@ import { Category } from '../models/category-model.js';
 
 export const getCategories = async (req, res) => {
     try {
-        const categories = await Category.find();
+        const { limit, skip } = req.query;
 
-        res.status(200).send({ message: 'ok', data: categories });
+        const [categories, totalDocuments] = await Promise.all([
+            Category.find({}).limit(limit).skip(skip),
+            Category.countDocuments({}),
+        ]);
+
+        if (!categories.length) {
+            throw new Error('Categories not found');
+        }
+
+        res.status(200).send({ message: 'ok', data: categories, totalDocuments });
     } catch (error) {
         res.status(404).send({ message: error.message });
     }
