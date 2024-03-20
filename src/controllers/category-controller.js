@@ -47,10 +47,22 @@ export const createCategory = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
     try {
-        const {} = req.body;
+        const { name, isDiscounted } = req.body;
         const { id } = req.params;
 
-        res.status(200).send({ message: 'ok' });
+        if (!name) {
+            throw new Error('Category name cannot be empty');
+        }
+
+        const discountInfo = isDiscounted === true || isDiscounted === false ? isDiscounted : false;
+
+        const updatedCategory = await Category.findOneAndUpdate(
+            { _id: id },
+            { name, isDiscounted: discountInfo },
+            { new: true }
+        );
+
+        res.status(200).send({ message: 'ok', data: updatedCategory });
     } catch (error) {
         res.status(404).send({ message: error.message });
     }
