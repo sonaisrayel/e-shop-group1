@@ -4,7 +4,7 @@ import { passwordValidationSchema } from '../utils/validations.js';
 
 export const addUserImage = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.userInfo;
 
         const updatedUser = await User.findOneAndUpdate({ _id: id }, { pictureUrl: req.file.path }, { new: true });
 
@@ -45,7 +45,7 @@ export const getUsers = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { id } = req.userInfo;
         const { oldPassword, newPassword, reNewPassword } = req.body;
 
         let updatedUser = null;
