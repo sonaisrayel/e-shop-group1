@@ -47,10 +47,27 @@ export const createCategory = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
     try {
-        const {} = req.body;
+        const { name, isDiscounted } = req.body;
         const { id } = req.params;
+        const { userInfo } = req;
 
-        res.status(200).send({ message: 'ok' });
+        if (userInfo.role !== 'admin') {
+            throw new Error('Only an admin can edit the Categories');
+        }
+
+        if (!name) {
+            throw new Error('Category name cannot be empty');
+        }
+
+        const discountInfo = isDiscounted === true || isDiscounted === false ? isDiscounted : false;
+
+        const updatedCategory = await Category.findOneAndUpdate(
+            { _id: id },
+            { name, isDiscounted: discountInfo },
+            { new: true }
+        );
+
+        res.status(200).send({ message: 'ok', data: updatedCategory });
     } catch (error) {
         res.status(404).send({ message: error.message });
     }
@@ -59,8 +76,19 @@ export const updateCategory = async (req, res) => {
 export const deleteCategory = async (req, res) => {
     try {
         const { id } = req.params;
+        const { userInfo } = req;
 
-        res.status(200).send({ message: 'ok' });
+        if (userInfo.role !== 'admin') {
+            throw new Error('Only an admin can delete the Categories');
+        }
+
+        const deletedCategory = await Category.deleteOne({ _id: id });
+
+        if (deletedCategory.acknowledged) {
+            res.status(200).send({ message: `Deleted ${deletedCategory.deletedCount} category` });
+        } else {
+            throw new Error('Something went wrong');
+        }
     } catch (error) {
         res.status(404).send({ message: error.message });
     }
