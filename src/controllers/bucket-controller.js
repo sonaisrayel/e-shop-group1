@@ -35,7 +35,7 @@ export const deleteProductFromBucket = async (req, res) => {
         const { productId } = req.params;
         const userId = req.userInfo.id;
 
-        const bucket = await Favorites.findOneAndUpdate(
+        const bucket = await Bucket.findOneAndUpdate(
             { userId, products: productId },
             {
                 $pull: {
@@ -51,6 +51,6 @@ export const deleteProductFromBucket = async (req, res) => {
 
         res.status(201).send({ message: 'Product has been removed from bucket' });
     } catch (error) {
-        res.status(404).send({ message: e.message });
+        res.status(404).send({ message: error.message });
     }
 };

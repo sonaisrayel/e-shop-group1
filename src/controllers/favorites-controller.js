@@ -21,7 +21,7 @@ export const deleteFavorite = async (req, res) => {
 
         res.status(201).send({ message: 'Product has been removed from Favorites' });
     } catch (error) {
-        res.status(404).send({ message: e.message });
+        res.status(404).send({ message: error.message });
     }
 };
 
