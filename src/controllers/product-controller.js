@@ -1,5 +1,4 @@
 import { Product } from '../models/product-model.js';
-import mongoose from 'mongoose';
 
 export const createProduct = async (req, res) => {
     try {
@@ -50,21 +49,14 @@ export const deleteProduct = async (req, res) => {
     try {
         const { userInfo } = req;
         const { id } = req.params;
-
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new Error('Invalid product ID');
-        }
-        const productToDelete = await Product.findOne({ _id: id });
+        const productToDelete = await Product.findById(id);
         if (!productToDelete) {
             throw new Error('Product not found');
         }
         if (!productToDelete.seller.equals(userInfo.id)) {
             throw new Error('You are not authorized to delete this product');
         }
-        const deletedProduct = await Product.findOneAndDelete(
-            { _id: id },
-            { new: true }
-        );
+        const deletedProduct = await Product.findOneAndDelete({ _id: id });
 
         res.status(200).send({ data: deletedProduct });
     } catch (e) {
@@ -77,10 +69,6 @@ export const updateProduct = async (req, res) => {
         const { userInfo } = req;
         const { id } = req.params;
         const payload = req.body;
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new Error('Invalid product ID');
-        }
-
         const productToUpdate = await Product.findOne({ _id: id });
         if (!productToUpdate) {
             throw new Error('Product not found');
@@ -88,15 +76,10 @@ export const updateProduct = async (req, res) => {
         if (!productToUpdate.seller.equals(userInfo.id)) {
             throw new Error('You are not authorized to update this product');
         }
-        const updatedProduct = await Product.findOneAndUpdate(
-            { _id: id },
-            payload,
-            { new: true }
-        );
+        const updatedProduct = await Product.findOneAndUpdate({ _id: id }, payload, { new: true });
 
         res.status(200).send({ data: updatedProduct });
-    }
-    catch (e) {
+    } catch (e) {
         res.status(404).send(e.message);
     }
 };
