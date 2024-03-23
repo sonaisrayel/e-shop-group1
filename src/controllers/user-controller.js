@@ -1,6 +1,7 @@
 import { User } from '../models/user-model.js';
 import CryptoLib from '../libs/crypto-lib.js';
 import { passwordValidationSchema } from '../utils/validations.js';
+import { Product } from '../models/product-model.js';
 
 export const addUserImage = async (req, res) => {
     try {
@@ -68,6 +69,23 @@ export const updateUser = async (req, res) => {
         }
 
         res.status(201).send({ message: 'ok', data: updatedUser });
+    } catch (error) {
+        res.status(404).send({ message: error.message });
+    }
+};
+
+export const getUserProducts = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { limit, skip } = req.query;
+        const [products, totalDocuments] = await Promise.all([
+            Product.find({ seller: id }).limit(limit).skip(skip),
+            Product.countDocuments({}),
+        ]);
+        if (!products.length) {
+            throw new Error('Product not found');
+        }
+        res.status(200).send({ message: 'ok', data: products, total: totalDocuments });
     } catch (error) {
         res.status(404).send({ message: error.message });
     }
