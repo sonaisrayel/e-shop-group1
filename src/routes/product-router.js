@@ -6,13 +6,14 @@ import {
     getProducts,
     updateProduct,
 } from '../controllers/product-controller.js';
+import { isAuthorized } from '../middlewars/auth-middleware.js';
 
 const router = Router();
 
-router.post('/', createProduct);
+router.post('/', isAuthorized, createProduct);
 router.get('/', getProducts);
 router.get('/:id', getProduct);
-router.delete('/:id', deleteProduct);
-router.patch('/:id', updateProduct);
+router.delete('/:id', isAuthorized, deleteProduct);
+router.patch('/:id', isAuthorized, updateProduct);
 
 export default router;
