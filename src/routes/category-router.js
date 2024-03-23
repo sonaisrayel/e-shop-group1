@@ -1,6 +1,8 @@
 import { Router } from 'express';
 const router = Router();
 
+import { isAdmin } from '../middlewars/admin-middleware.js';
+
 import {
     getCategory,
     getCategories,
@@ -11,8 +13,8 @@ import {
 
 router.get('/', getCategories);
 router.get('/:id', getCategory);
-router.post('/', createCategory);
-router.put('/:id', updateCategory);
-router.delete('/:id', deleteCategory);
+router.post('/', isAdmin, createCategory);
+router.put('/:id', isAdmin, updateCategory);
+router.delete('/:id', isAdmin, deleteCategory);
 
 export default router;

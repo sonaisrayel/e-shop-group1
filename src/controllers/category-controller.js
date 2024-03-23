@@ -33,11 +33,6 @@ export const getCategory = async (req, res) => {
 export const createCategory = async (req, res) => {
     try {
         const { name } = req.body;
-        const { userInfo } = req;
-
-        if (userInfo.role !== 'admin') {
-            throw new Error('Only an admin can add a new Category');
-        }
 
         if (!name) {
             throw new Error('Name cannot be empty');
@@ -58,11 +53,6 @@ export const updateCategory = async (req, res) => {
     try {
         const { name, isDiscounted } = req.body;
         const { id } = req.params;
-        const { userInfo } = req;
-
-        if (userInfo.role !== 'admin') {
-            throw new Error('Only an admin can edit the Categories');
-        }
 
         if (!name) {
             throw new Error('Category name cannot be empty');
@@ -85,11 +75,6 @@ export const updateCategory = async (req, res) => {
 export const deleteCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const { userInfo } = req;
-
-        if (userInfo.role !== 'admin') {
-            throw new Error('Only an admin can delete the Categories');
-        }
 
         const deletedCategory = await Category.deleteOne({ _id: id });
 

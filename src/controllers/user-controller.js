@@ -28,12 +28,6 @@ export const getUser = async (req, res) => {
 
 export const getUsers = async (req, res) => {
     try {
-        const { role } = req.userInfo;
-
-        if (role !== 'admin') {
-            throw new Error('You are not authorized');
-        }
-
         const buyers = await User.find({ role: 'buyer' }).select('-password');
         const sellers = await User.find({ role: 'seller' }).select('-password');
 
