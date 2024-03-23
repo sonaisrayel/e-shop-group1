@@ -23,14 +23,15 @@ app.use(express.json());
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 
+app.use('/products', productsRouter);
+app.use('/users', usersRouter);
+
 app.use(isAuthorized);
 
 app.use('/categories', categoriesRouter);
 app.use('/bucket', bucketsRouter);
 app.use('/favorites', favoritesRouter);
 app.use('/orders', ordersRouter);
-app.use('/products', productsRouter);
-app.use('/users', usersRouter);
 
 connection();
 
