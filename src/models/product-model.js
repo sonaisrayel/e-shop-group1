@@ -8,11 +8,15 @@ const productSchema = new Schema({
         required: true,
     },
     seller: {
-        type: Schema.Types.ObjectId, 
-        ref: 'User', 
-        required: true
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
     },
     price: {
+        type: Number,
+        required: true,
+    },
+    quantity: {
         type: Number,
         required: true,
     },

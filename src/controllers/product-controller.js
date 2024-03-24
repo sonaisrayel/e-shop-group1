@@ -3,11 +3,11 @@ import { Product } from '../models/product-model.js';
 export const createProduct = async (req, res) => {
     try {
         const { userInfo } = req;
-        const { name, price, description, category, author } = req.body;
+        const { name, price, description, category, author, quantity } = req.body;
         if (!userInfo || userInfo.role !== 'seller') {
             throw new Error('Only sellers are authorized to create products');
         }
-        const newProduct = new Product({ name, price, seller: userInfo.id, description, category, author });
+        const newProduct = new Product({ name, price, seller: userInfo.id, quantity, description, category, author });
         await newProduct.save();
         res.status(201).send({ data: newProduct });
     } catch (e) {
