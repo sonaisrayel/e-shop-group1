@@ -44,18 +44,6 @@ const userSchema = new Schema({
         type: Number,
         required: true,
     },
-    cardNumber: {
-        type: Number,
-        required: true,
-    },
-    cardExpitarionDate: {
-        type: Date,
-        required: true,
-    },
-    cardOwnerName: {
-        type: String,
-        required: true,
-    },
 });
 
 export const User = model('User', userSchema);
