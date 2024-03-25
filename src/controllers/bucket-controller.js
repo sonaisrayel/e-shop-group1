@@ -1,4 +1,5 @@
 import { Bucket } from '../models/bucket-model.js';
+import { Product } from '../models/product-model.js';
 
 export const getBucket = async (req, res) => {
     try {
@@ -13,24 +14,50 @@ export const getBucket = async (req, res) => {
     }
 };
 
-export const addProductToBucket = async (req, res) => {
+export const  addProductToBucket  = async (req, res) => {
+    const { productId, quantity } = req.body;
+    const { id } = req.params;
+    const userId = req.userInfo._id;
+
     try {
-        const { productId } = req.body;
-        const userId = req.userInfo.id;
+        const product = await Product.findOne({ _id: productId });
 
-        let quantity = req.body.quantity ? req.body.quantity : 1;
+        if (product.quantity < quantity) {
+            throw new Error('Product not available in that quantity');
+        }
 
-        const bucket = await Bucket.findOneAndUpdate(
-            { userId },
-            { $addToSet: { products: { product: productId, quantity } } },
-            { new: true }
-        );
+        const currentBucketData = await Bucket.findOne({ userId });
 
-        res.status(201).send({ message: 'Product added to Bucket', data: bucket });
+        if (!currentBucketData) {
+            const data = {
+                userId,
+                products: [
+                    {
+                        productId,
+                        quantity,
+                    },
+                ],
+            };
+            const bucketItems = await Bucket.create(data);
+            res.status(201).send(bucketItems);
+        }
+
+
+        const pickedProduct = currentBucketData.products.find((prod) => prod.productId.toString() === productId);
+
+        if (pickedProduct) {
+            pickedProduct.quantity += quantity;
+        } else {
+            currentBucketData.products.push({ productId, quantity });
+        }
+
+        const bucketData = await currentBucketData.save();
+
+        res.status(201).send(bucketData)
     } catch (e) {
-        res.status(404).send({ message: e.message });
+        res.status(404).send(e.message)
     }
-};
+}
 
 export const updateProductInBucket = async (req, res) => {
     try {
