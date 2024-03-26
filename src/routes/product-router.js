@@ -10,10 +10,13 @@ import { isAuthorized } from '../middlewars/auth-middleware.js';
 
 const router = Router();
 
-router.post('/', isAuthorized, createProduct);
 router.get('/', getProducts);
 router.get('/:id', getProduct);
-router.delete('/:id', isAuthorized, deleteProduct);
-router.patch('/:id', isAuthorized, updateProduct);
+
+router.use(isAuthorized);
+
+router.post('/', createProduct);
+router.delete('/:id', deleteProduct);
+router.patch('/:id', updateProduct);
 
 export default router;

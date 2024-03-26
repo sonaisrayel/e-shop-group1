@@ -7,9 +7,12 @@ import { isAuthorized } from '../middlewars/auth-middleware.js';
 import { addUserImage, getUser, getUsers, updateUser, getUserProducts } from '../controllers/user-controller.js';
 
 router.get('/:id/products', getUserProducts);
-router.get('/', isAuthorized, isAdmin, getUsers);
-router.get('/:id', isAuthorized, getUser);
-router.patch('/', isAuthorized, upload.single('file'), updateUser);
-router.post('/image', isAuthorized, upload.single('file'), addUserImage);
+
+router.use(isAuthorized);
+
+router.get('/', isAdmin, getUsers);
+router.get('/:id', getUser);
+router.patch('/', upload.single('file'), updateUser);
+router.post('/image', upload.single('file'), addUserImage);
 
 export default router;
