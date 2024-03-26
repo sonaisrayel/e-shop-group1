@@ -20,3 +20,12 @@ export const passwordValidationSchema = Joi.object({
     newPassword: Joi.string().pattern(new RegExp(regularExpression)),
     reNewPassword: Joi.ref('newPassword'),
 }).with('newPassword', 'reNewPassword');
+
+export const productValidationSchema = Joi.object({
+    name: Joi.string().required(),
+    price: Joi.number().min(0).required(),
+    quantity: Joi.number().integer().min(0).required(),
+    category: Joi.string().required(),
+    description: Joi.string().allow('').optional(),
+    author: Joi.string().required(),
+});
