@@ -14,12 +14,11 @@ export const getBucket = async (req, res) => {
     }
 };
 
-export const  addProductToBucket  = async (req, res) => {
-    const { productId, quantity } = req.body;
-    const { id } = req.params;
-    const userId = req.userInfo._id;
-
+export const addProductToBucket = async (req, res) => {
     try {
+        const { productId, quantity } = req.body;
+        const userId = req.userInfo._id;
+
         const product = await Product.findOne({ _id: productId });
 
         if (product.quantity < quantity) {
@@ -38,10 +37,10 @@ export const  addProductToBucket  = async (req, res) => {
                     },
                 ],
             };
-            const bucketItems = await Bucket.create(data);
-            res.status(201).send(bucketItems);
-        }
 
+            const bucketItems = await Bucket.create(data);
+            res.status(201).send({ message: 'Bucket was created', data: bucketItems });
+        }
 
         const pickedProduct = currentBucketData.products.find((prod) => prod.productId.toString() === productId);
 
@@ -53,11 +52,11 @@ export const  addProductToBucket  = async (req, res) => {
 
         const bucketData = await currentBucketData.save();
 
-        res.status(201).send(bucketData)
+        res.status(201).send(bucketData);
     } catch (e) {
-        res.status(404).send(e.message)
+        res.status(404).send(e.message);
     }
-}
+};
 
 export const updateProductInBucket = async (req, res) => {
     try {
@@ -65,7 +64,7 @@ export const updateProductInBucket = async (req, res) => {
         const userId = req.userInfo.id;
 
         res.status(201).send({ message: 'ok' });
-    } catch (error) {
+    } catch (e) {
         res.status(404).send({ message: e.message });
     }
 };
