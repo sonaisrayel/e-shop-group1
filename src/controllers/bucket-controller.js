@@ -6,18 +6,21 @@ export const getBucket = async (req, res) => {
         const { limit, skip } = req.query;
         const userId = req.userInfo.id;
 
-        const favorites = await Bucket.findOne({ userId }).limit(limit).skip(skip).populate('products.product');
+        const bucket = await Bucket.findOne({ userId }).limit(limit).skip(skip).populate('products.productId');
 
-        res.status(201).send({ message: 'ok', data: favorites });
+        res.status(201).send({ message: 'ok', data: bucket });
     } catch (e) {
         res.status(404).send({ message: e.message });
     }
 };
 
+// if we improve this code, I think we will not need updateProductInBucket functionality, or better we can change the name of this
+// controller to it.
+
 export const addProductToBucket = async (req, res) => {
     try {
         const { productId, quantity } = req.body;
-        const userId = req.userInfo._id;
+        const userId = req.userInfo.id;
 
         const product = await Product.findOne({ _id: productId });
 
@@ -27,6 +30,7 @@ export const addProductToBucket = async (req, res) => {
 
         const currentBucketData = await Bucket.findOne({ userId });
 
+        // this can be remoived
         if (!currentBucketData) {
             const data = {
                 userId,
@@ -41,11 +45,13 @@ export const addProductToBucket = async (req, res) => {
             const bucketItems = await Bucket.create(data);
             res.status(201).send({ message: 'Bucket was created', data: bucketItems });
         }
+        // end to be removed
 
         const pickedProduct = currentBucketData.products.find((prod) => prod.productId.toString() === productId);
 
         if (pickedProduct) {
-            pickedProduct.quantity += quantity;
+            // I think we do not need to add the quantity, but only make it equal to the quantity received from the user/front
+            pickedProduct.quantity += Number(quantity);
         } else {
             currentBucketData.products.push({ productId, quantity });
         }
@@ -74,21 +80,13 @@ export const deleteProductFromBucket = async (req, res) => {
         const { productId } = req.params;
         const userId = req.userInfo.id;
 
-        const bucket = await Bucket.findOneAndUpdate(
-            { userId, products: productId },
-            {
-                $pull: {
-                    products: productId,
-                },
-            },
-            { new: true }
+        const currentBucketData = await Bucket.findOne({ userId });
+        currentBucketData.products = currentBucketData.products.filter(
+            (prod) => prod.productId.toString() !== productId
         );
+        const bucketData = await currentBucketData.save();
 
-        if (!bucket) {
-            throw new Error('No such product in the bucket.');
-        }
-
-        res.status(201).send({ message: 'Product has been removed from bucket' });
+        res.status(201).send({ message: 'Product has been removed from bucket', updatedBucket: bucketData });
     } catch (error) {
         res.status(404).send({ message: error.message });
     }
