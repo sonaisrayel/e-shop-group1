@@ -1,5 +1,6 @@
 import { Product } from '../models/product-model.js';
 import { productValidationSchema } from '../utils/validations.js';
+
 export const createProduct = async (req, res) => {
     try {
         const { userInfo } = req;
@@ -79,5 +80,27 @@ export const updateProduct = async (req, res) => {
         res.status(200).send({ data: productToUpdate });
     } catch (e) {
         res.status(404).send(e.message);
+    }
+};
+export const addProductImage = async (req, res) => {
+    try {
+        const { id } = req.params;
+       // console.log(id);
+        
+
+        const { userInfo } = req;
+        console.log(userInfo.id)
+
+        const productImage = await Product.findOneAndUpdate(
+            { _id: id, seller: userInfo.id },
+            { pictureUrl: req.file.path },
+            { new: true }
+        );
+        console.log(req.file.path)
+    
+
+        res.status(201).send({ data: productImage });
+    } catch (error) {
+        res.status(404).send({ message: error.message });
     }
 };
