@@ -19,7 +19,7 @@ const userSchema = new Schema({
     },
     role: {
         type: String,
-        enum: ['buyer', 'seller', 'admin'],
+        enum: ['buyer', 'seller'],
         default: 'buyer',
     },
     pictureUrl: {
