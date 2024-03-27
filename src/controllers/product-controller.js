@@ -1,5 +1,6 @@
 import { Product } from '../models/product-model.js';
 import { productValidationSchema } from '../utils/validations.js';
+
 export const createProduct = async (req, res) => {
     try {
         const { userInfo } = req;
@@ -15,6 +16,26 @@ export const createProduct = async (req, res) => {
         res.status(201).send({ data: newProduct });
     } catch (e) {
         res.status(403).send({ message: e.message });
+    }
+};
+export const addProductImage = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { userInfo } = req;
+        if (!req.file) {
+            throw new Error('Missing required parameters');
+        }
+        const productImage = await Product.findOneAndUpdate(
+            { _id: id, seller: userInfo.id },
+            { pictureUrl: req.file.path },
+            { new: true }
+        );
+        if (!productImage) {
+            throw new Error('Product not found');
+        }
+        res.status(201).send({ message: 'ok', data: productImage });
+    } catch (error) {
+        res.status(404).send({ message: error.message });
     }
 };
 
@@ -69,13 +90,21 @@ export const updateProduct = async (req, res) => {
         const { userInfo } = req;
         const { id } = req.params;
         const payload = req.body;
-        const productToUpdate = await Product.findOneAndUpdate({ _id: id, seller: userInfo.id }, payload, {
-            new: true,
-        });
+        let productToUpdate = null;
+        if (req.file) {
+            productToUpdate = await Product.findOneAndUpdate(
+                { _id: id, seller: userInfo.id },
+                { pictureUrl: req.file.path },
+                { new: true }
+            );
+        } else {
+            productToUpdate = await Product.findOneAndUpdate({ _id: id, seller: userInfo.id }, payload, {
+                new: true,
+            });
+        }
         if (!productToUpdate) {
             throw new Error('Product not found or unauthorized to update');
         }
-
         res.status(200).send({ data: productToUpdate });
     } catch (e) {
         res.status(404).send(e.message);
