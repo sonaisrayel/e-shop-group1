@@ -16,16 +16,13 @@ export default class ResponseHandler {
         return res.status(HttpStatusCodes.OK).send(data);
     }
 
-    static handleValidationError(err, res) {
-        return res.status(HttpStatusCodes.UNPROCESSABLE_ENTITY).send({ message: err.message });
+    static handleValidationError(res, message) {
+        return res.status(HttpStatusCodes.UNPROCESSABLE_ENTITY).send({ message });
     }
-    static handleServerError(err, res) {
-        return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({ message: err.message });
+    static handleNotFoundError(res, message) {
+        return res.status(HttpStatusCodes.NOT_FOUND).send({ message });
     }
-    static handleNotFoundError(err, res) {
-        return res.status(HttpStatusCodes.NOT_FOUND).send({ message: err.message });
-    }
-    static handleAuthorizationError(err, res) {
-        return res.status(HttpStatusCodes.FORBIDDEN).send({ message: err.message });
+    static handleAuthorizationError(res, message) {
+        return res.status(HttpStatusCodes.FORBIDDEN).send({ message });
     }
 }

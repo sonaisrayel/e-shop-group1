@@ -1,11 +1,14 @@
 import { Product } from '../models/product-model.js';
+import ResponseHandler from '../responses/responseHandler.js';
 import { productValidationSchema } from '../utils/validations.js';
 
-export const createProduct = async (req, res) => {
+export const createProduct = async (req, res, next) => {
     try {
         const { userInfo } = req;
         if (!userInfo || userInfo.role !== 'seller') {
-            throw new Error('Only sellers are authorized to create products');
+            return ResponseHandler.handleAuthorizationError(res, {
+                message: 'Only sellers are authorized to create products',
+            });
         }
         const { name, price, description, category, author, quantity } = await productValidationSchema.validateAsync(
             req.body
@@ -13,17 +16,17 @@ export const createProduct = async (req, res) => {
 
         const newProduct = new Product({ name, price, seller: userInfo.id, quantity, description, category, author });
         await newProduct.save();
-        res.status(201).send({ data: newProduct });
-    } catch (e) {
-        res.status(403).send({ message: e.message });
+        return ResponseHandler.handlePostResponse(res, { data: newProduct });
+    } catch (err) {
+        next(err.message);
     }
 };
-export const addProductImage = async (req, res) => {
+export const addProductImage = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { userInfo } = req;
         if (!req.file) {
-            throw new Error('Missing required parameters');
+            return ResponseHandler.handleValidationError(res, { message: 'Missing required parameters' });
         }
         const productImage = await Product.findOneAndUpdate(
             { _id: id, seller: userInfo.id },
@@ -31,15 +34,15 @@ export const addProductImage = async (req, res) => {
             { new: true }
         );
         if (!productImage) {
-            throw new Error('Product not found');
+            return ResponseHandler.handleNotFoundError(res, { message: 'Product not found' });
         }
-        res.status(201).send({ message: 'ok', data: productImage });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handlePostResponse(res, { data: productImage });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const getProducts = async (req, res) => {
+export const getProducts = async (req, res, next) => {
     try {
         const { limit, skip } = req.query;
         const [products, totalDocuments] = await Promise.all([
@@ -47,45 +50,45 @@ export const getProducts = async (req, res) => {
             Product.countDocuments({}),
         ]);
         if (!products.length) {
-            throw new Error('Product not found');
+            return ResponseHandler.handleNotFoundError(res, { message: 'Product not found' });
         }
 
-        res.status(201).send({ data: products, total: totalDocuments });
-    } catch (e) {
-        res.status(404).send({ message: e.message });
+        return ResponseHandler.handleGetResponse(res, { data: products, total: totalDocuments });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const getProduct = async (req, res) => {
+export const getProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
         const product = await Product.findById(id);
         if (!product) {
-            throw new Error('Product not found');
+            return ResponseHandler.handleNotFoundError(res, { message: 'Product not found' });
         }
-        res.status(201).send({ data: product });
-    } catch (e) {
-        res.status(404).send({ message: e.message });
+        return ResponseHandler.handleGetResponse(res, { data: product });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res, next) => {
     try {
         const { userInfo } = req;
         const { id } = req.params;
         const productToDelete = await Product.findOneAndDelete({ _id: id, seller: userInfo.id });
 
         if (!productToDelete) {
-            throw new Error('Product not found or unauthorized to delete');
+            return ResponseHandler.handleNotFoundError(res, { message: 'Product not found or unauthorized to delete' });
         }
 
-        res.status(200).send({ data: productToDelete });
-    } catch (e) {
-        res.status(404).send({ message: e.message });
+        return ResponseHandler.handleDeleteResponse(res, { data: productToDelete });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res, next) => {
     try {
         const { userInfo } = req;
         const { id } = req.params;
@@ -103,10 +106,10 @@ export const updateProduct = async (req, res) => {
             });
         }
         if (!productToUpdate) {
-            throw new Error('Product not found or unauthorized to update');
+            return ResponseHandler.handleNotFoundError(res, { message: 'Product not found or unauthorized to update' });
         }
-        res.status(200).send({ data: productToUpdate });
-    } catch (e) {
-        res.status(404).send(e.message);
+        return ResponseHandler.handleUpdateResponse(res, { data: productToUpdate });
+    } catch (err) {
+        next(err.message);
     }
 };
