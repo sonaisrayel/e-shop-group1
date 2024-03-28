@@ -8,6 +8,7 @@ const { PORT } = process.env;
 
 import { connection } from './storages/db.js';
 import { isAuthorized } from './middlewars/auth-middleware.js';
+import ErrorMiddleware from './responses/customError.js';
 
 import categoriesRouter from '../src/routes/category-router.js';
 import bucketsRouter from '../src/routes/bucket-router.js';
@@ -34,6 +35,8 @@ app.use('/favorites', favoritesRouter);
 app.use('/orders', ordersRouter);
 
 connection();
+
+app.use(ErrorMiddleware.customError);
 
 app.listen(PORT, () => {
     console.log(`Server started at port ${PORT}`);
