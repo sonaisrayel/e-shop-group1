@@ -4,8 +4,9 @@ import { Bucket } from '../models/bucket-model.js';
 import CryptoLib from '../libs/crypto-lib.js';
 import JWT from '../libs/jwt-lib.js';
 import { userValidationSchema } from '../utils/validations.js';
+import ResponseHandler from '../responses/responseHandler.js';
 
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
     try {
         const { username, email, password, rePassword, role, address1, address2, city, country, mobile } = req.body;
 
@@ -25,11 +26,11 @@ export const register = async (req, res) => {
         const existingUsername = await User.findOne({ username });
 
         if (existingUsername) {
-            throw new Error('Duplicate Username');
+            return ResponseHandler.handleValidationError(res, { message: 'Duplicate Username' });
         }
 
         if (existingEmail) {
-            throw new Error('Duplicate Email');
+            return ResponseHandler.handleValidationError(res, { message: 'Duplicate Email' });
         }
 
         const hashedPassword = await CryptoLib.makeHashedPassword(password);
@@ -63,26 +64,26 @@ export const register = async (req, res) => {
             ]);
         }
 
-        res.status(201).send({ message: 'User is created.', user: registeredUser });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handlePostResponse(res, { message: 'User is created.', data: registeredUser });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
         const [user] = await User.find({ email });
 
         if (!user) {
-            throw new Error('Email or Password is incorrect.');
+            return ResponseHandler.handleValidationError(res, { message: 'Email or Password is incorrect.' });
         }
 
         const isPasswordCorrect = await CryptoLib.compareHashedPassword(password, user.password);
 
         if (!isPasswordCorrect) {
-            throw new Error('Email or Password is incorrect.');
+            return ResponseHandler.handleValidationError(res, { message: 'Email or Password is incorrect.' });
         }
 
         const token = await JWT.createToken({
@@ -92,8 +93,7 @@ export const login = async (req, res) => {
             role: user.role,
         });
 
-        res.status(200).send({
-            message: 'The user is logged in.',
+        return ResponseHandler.handlePostResponse(res, {
             data: {
                 id: user._id,
                 username: user.username,
@@ -102,7 +102,7 @@ export const login = async (req, res) => {
             },
             token,
         });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+    } catch (err) {
+        next(err.message);
     }
 };
