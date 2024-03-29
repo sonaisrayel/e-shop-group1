@@ -64,3 +64,18 @@ export const deleteProductFromBucket = async (req, res, next) => {
         next(err.message);
     }
 };
+
+export const deleteBucket = async (req, res, next) => {
+    try {
+        const userId = req.userInfo.id;
+
+        const currentBucketData = await Bucket.findOne({ userId });
+        currentBucketData.products = [];
+
+        const bucketData = await currentBucketData.save();
+
+        return ResponseHandler.handleDeleteResponse(res, { data: bucketData });
+    } catch (err) {
+        next(err.message);
+    }
+};
