@@ -2,43 +2,44 @@ import { User } from '../models/user-model.js';
 import CryptoLib from '../libs/crypto-lib.js';
 import { passwordValidationSchema } from '../utils/validations.js';
 import { Product } from '../models/product-model.js';
+import ResponseHandler from '../responses/responseHandler.js';
 
-export const addUserImage = async (req, res) => {
+export const addUserImage = async (req, res, next) => {
     try {
         const { id } = req.userInfo;
 
         const updatedUser = await User.findOneAndUpdate({ _id: id }, { pictureUrl: req.file.path }, { new: true });
 
-        res.status(201).send({ message: 'ok', data: updatedUser });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handleUpdateResponse(res, { data: updatedUser });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const getUser = async (req, res) => {
+export const getUser = async (req, res, next) => {
     try {
         const { id } = req.params;
 
         const user = await User.findById(id).select('-password');
 
-        res.status(200).send({ message: 'ok', data: user });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handleGetResponse(res, { data: user });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const getUsers = async (req, res) => {
+export const getUsers = async (req, res, next) => {
     try {
         const buyers = await User.find({ role: 'buyer' }).select('-password');
         const sellers = await User.find({ role: 'seller' }).select('-password');
 
-        res.status(201).send({ message: 'ok', buyers, sellers });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handleGetResponse(res, { buyers, sellers });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const updateUser = async (req, res) => {
+export const updateUser = async (req, res, next) => {
     try {
         const { id } = req.userInfo;
         const { oldPassword, newPassword, reNewPassword } = req.body;
@@ -51,7 +52,7 @@ export const updateUser = async (req, res) => {
             const isPasswordCorrect = await CryptoLib.compareHashedPassword(oldPassword, user.password);
 
             if (!isPasswordCorrect) {
-                throw new Error('Wrong password');
+                return ResponseHandler.handleValidationError(res, { message: 'Wrong password' });
             }
 
             await passwordValidationSchema.validateAsync({
@@ -68,13 +69,13 @@ export const updateUser = async (req, res) => {
             updatedUser = await User.findOneAndUpdate({ _id: id }, { pictureUrl: req.file.path }, { new: true });
         }
 
-        res.status(201).send({ message: 'ok', data: updatedUser });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handleUpdateResponse(res, { data: updatedUser });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const getUserProducts = async (req, res) => {
+export const getUserProducts = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { limit, skip } = req.query;
@@ -83,10 +84,10 @@ export const getUserProducts = async (req, res) => {
             Product.countDocuments({}),
         ]);
         if (!products.length) {
-            throw new Error('Product not found');
+            return ResponseHandler.handleNotFoundError(res, { message: 'Product not found' });
         }
-        res.status(200).send({ message: 'ok', data: products, total: totalDocuments });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handleGetResponse(res, { data: products, total: totalDocuments });
+    } catch (err) {
+        next(err.message);
     }
 };
