@@ -1,6 +1,7 @@
 import { Category } from '../models/category-model.js';
+import ResponseHandler from '../responses/responseHandler.js';
 
-export const getCategories = async (req, res) => {
+export const getCategories = async (req, res, next) => {
     try {
         const { limit, skip } = req.query;
 
@@ -10,32 +11,32 @@ export const getCategories = async (req, res) => {
         ]);
 
         if (!categories.length) {
-            throw new Error('Categories not found');
+            return ResponseHandler.handleNotFoundError(res, { message: 'Categories not found' });
         }
 
-        res.status(200).send({ message: 'ok', data: categories, totalDocuments });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handleGetResponse(res, { data: categories, total: totalDocuments });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const getCategory = async (req, res) => {
+export const getCategory = async (req, res, next) => {
     try {
         const { id } = req.params;
         const category = await Category.findById(id);
 
-        res.status(200).send({ message: 'ok', data: category });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handleGetResponse(res, { data: category });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const createCategory = async (req, res) => {
+export const createCategory = async (req, res, next) => {
     try {
         const { name } = req.body;
 
         if (!name) {
-            throw new Error('Name cannot be empty');
+            return ResponseHandler.handleValidationError(res, { message: 'Name cannot be empty' });
         }
 
         const category = new Category({ name });
@@ -43,19 +44,19 @@ export const createCategory = async (req, res) => {
 
         const createdCategory = await Category.find({ name });
 
-        res.status(200).send({ message: 'ok', data: createdCategory });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handlePostResponse(res, { data: createdCategory });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const updateCategory = async (req, res) => {
+export const updateCategory = async (req, res, next) => {
     try {
         const { name, isDiscounted } = req.body;
         const { id } = req.params;
 
         if (!name) {
-            throw new Error('Category name cannot be empty');
+            return ResponseHandler.handleValidationError(res, { message: 'Category name cannot be empty' });
         }
 
         const discountInfo = isDiscounted === true || isDiscounted === false ? isDiscounted : false;
@@ -66,24 +67,26 @@ export const updateCategory = async (req, res) => {
             { new: true }
         );
 
-        res.status(200).send({ message: 'ok', data: updatedCategory });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        return ResponseHandler.handleUpdateResponse(res, { data: updatedCategory });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const deleteCategory = async (req, res) => {
+export const deleteCategory = async (req, res, next) => {
     try {
         const { id } = req.params;
 
         const deletedCategory = await Category.deleteOne({ _id: id });
 
-        if (deletedCategory.acknowledged) {
-            res.status(200).send({ message: `Deleted ${deletedCategory.deletedCount} category` });
-        } else {
-            throw new Error('Something went wrong');
+        if (!deletedCategory.acknowledged) {
+            throw new Error();
         }
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+
+        return ResponseHandler.handleDeleteResponse(res, {
+            message: `Deleted ${deletedCategory.deletedCount} category`,
+        });
+    } catch (err) {
+        next(err.message);
     }
 };
