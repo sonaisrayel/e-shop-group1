@@ -27,18 +27,21 @@ export const updateBucket = async (req, res, next) => {
         }
 
         const currentBucketData = await Bucket.findOne({ userId });
+        let amount = product.price * quantity
 
         const pickedProduct = currentBucketData.products.find((prod) => prod.productId.toString() === productId);
-
+        //
         if (pickedProduct) {
             pickedProduct.quantity = Number(quantity);
+
         } else {
             currentBucketData.products.push({ productId, quantity });
         }
 
+        currentBucketData.totalPrice += amount;
+
         const bucketData = await currentBucketData.save();
 
-        res.status(201).send(bucketData);
         return ResponseHandler.handlePostResponse(res, { data: bucketData });
     } catch (err) {
         next(err.message);
