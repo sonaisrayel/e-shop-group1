@@ -20,25 +20,23 @@ export const updateBucket = async (req, res, next) => {
         const { productId, quantity } = req.body;
         const userId = req.userInfo.id;
 
-        const product = await Product.findOne({ _id: productId });
+        const product = await Product.findById({ _id: productId });
 
         if (product.quantity < quantity) {
-            return ResponseHandler.handleValidationError(res, { message: 'Product not available in that quantity' });
+            return ResponseHandler.handleValidationError(res, 'Product not available in that quantity');
         }
 
         const currentBucketData = await Bucket.findOne({ userId });
-        let amount = product.price * quantity
 
         const pickedProduct = currentBucketData.products.find((prod) => prod.productId.toString() === productId);
-        //
-        if (pickedProduct) {
-            pickedProduct.quantity = Number(quantity);
 
+        if (pickedProduct) {
+            currentBucketData.totalPrice += product.price * (quantity - pickedProduct.quantity);
+            pickedProduct.quantity = Number(quantity);
         } else {
+            currentBucketData.totalPrice += product.price * quantity;
             currentBucketData.products.push({ productId, quantity });
         }
-
-        currentBucketData.totalPrice += amount;
 
         const bucketData = await currentBucketData.save();
 
@@ -53,10 +51,22 @@ export const deleteProductFromBucket = async (req, res, next) => {
         const { productId } = req.params;
         const userId = req.userInfo.id;
 
+        const product = await Product.findById({ _id: productId });
+
         const currentBucketData = await Bucket.findOne({ userId });
-        currentBucketData.products = currentBucketData.products.filter(
-            (prod) => prod.productId.toString() !== productId
-        );
+        let quantityInBucket = 0;
+
+        currentBucketData.products = currentBucketData.products.filter((prod) => {
+            if (prod.productId.toString() === productId) {
+                quantityInBucket = prod.quantity;
+            }
+
+            return prod.productId.toString() !== productId;
+        });
+
+        console.log(quantityInBucket, 'quantity in bucket');
+        currentBucketData.totalPrice -= quantityInBucket * product.price;
+
         const bucketData = await currentBucketData.save();
 
         return ResponseHandler.handleDeleteResponse(res, {
@@ -73,7 +83,9 @@ export const deleteBucket = async (req, res, next) => {
         const userId = req.userInfo.id;
 
         const currentBucketData = await Bucket.findOne({ userId });
+
         currentBucketData.products = [];
+        currentBucketData.totalPrice = 0;
 
         const bucketData = await currentBucketData.save();
 
