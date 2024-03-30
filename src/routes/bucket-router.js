@@ -1,16 +1,11 @@
 import { Router } from 'express';
 const router = Router();
 
-import {
-    getBucket,
-    addProductToBucket,
-    updateProductInBucket,
-    deleteProductFromBucket,
-} from '../controllers/bucket-controller.js';
+import { getBucket, updateBucket, deleteProductFromBucket, deleteBucket } from '../controllers/bucket-controller.js';
 
 router.get('/', getBucket);
-router.post('/', addProductToBucket);
-router.patch('/:productId', updateProductInBucket);
+router.post('/', updateBucket);
 router.delete('/:productId', deleteProductFromBucket);
+router.delete('/', deleteBucket);
 
 export default router;

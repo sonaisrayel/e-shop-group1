@@ -1,69 +1,96 @@
 import { Bucket } from '../models/bucket-model.js';
+import { Product } from '../models/product-model.js';
+import ResponseHandler from '../responses/responseHandler.js';
 
-export const getBucket = async (req, res) => {
+export const getBucket = async (req, res, next) => {
     try {
         const { limit, skip } = req.query;
         const userId = req.userInfo.id;
 
-        const favorites = await Bucket.findOne({ userId }).limit(limit).skip(skip).populate('products.product');
+        const bucket = await Bucket.findOne({ userId }).limit(limit).skip(skip).populate('products.productId');
 
-        res.status(201).send({ message: 'ok', data: favorites });
-    } catch (e) {
-        res.status(404).send({ message: e.message });
+        return ResponseHandler.handleGetResponse(res, { data: bucket });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const addProductToBucket = async (req, res) => {
-    try {
-        const { productId } = req.body;
-        const userId = req.userInfo.id;
-
-        let quantity = req.body.quantity ? req.body.quantity : 1;
-
-        const bucket = await Bucket.findOneAndUpdate(
-            { userId },
-            { $addToSet: { products: { product: productId, quantity } } },
-            { new: true }
-        );
-
-        res.status(201).send({ message: 'Product added to Bucket', data: bucket });
-    } catch (e) {
-        res.status(404).send({ message: e.message });
-    }
-};
-
-export const updateProductInBucket = async (req, res) => {
+export const updateBucket = async (req, res, next) => {
     try {
         const { productId, quantity } = req.body;
         const userId = req.userInfo.id;
 
-        res.status(201).send({ message: 'ok' });
-    } catch (error) {
-        res.status(404).send({ message: e.message });
+        const product = await Product.findById({ _id: productId });
+
+        if (product.quantity < quantity) {
+            return ResponseHandler.handleValidationError(res, 'Product not available in that quantity');
+        }
+
+        const currentBucketData = await Bucket.findOne({ userId });
+
+        const pickedProduct = currentBucketData.products.find((prod) => prod.productId.toString() === productId);
+
+        if (pickedProduct) {
+            currentBucketData.totalPrice += product.price * (quantity - pickedProduct.quantity);
+            pickedProduct.quantity = Number(quantity);
+        } else {
+            currentBucketData.totalPrice += product.price * quantity;
+            currentBucketData.products.push({ productId, quantity });
+        }
+
+        const bucketData = await currentBucketData.save();
+
+        return ResponseHandler.handlePostResponse(res, { data: bucketData });
+    } catch (err) {
+        next(err.message);
     }
 };
 
-export const deleteProductFromBucket = async (req, res) => {
+export const deleteProductFromBucket = async (req, res, next) => {
     try {
         const { productId } = req.params;
         const userId = req.userInfo.id;
 
-        const bucket = await Bucket.findOneAndUpdate(
-            { userId, products: productId },
-            {
-                $pull: {
-                    products: productId,
-                },
-            },
-            { new: true }
-        );
+        const product = await Product.findById({ _id: productId });
 
-        if (!bucket) {
-            throw new Error('No such product in the bucket.');
-        }
+        const currentBucketData = await Bucket.findOne({ userId });
+        let quantityInBucket = 0;
 
-        res.status(201).send({ message: 'Product has been removed from bucket' });
-    } catch (error) {
-        res.status(404).send({ message: error.message });
+        currentBucketData.products = currentBucketData.products.filter((prod) => {
+            if (prod.productId.toString() === productId) {
+                quantityInBucket = prod.quantity;
+            }
+
+            return prod.productId.toString() !== productId;
+        });
+
+        console.log(quantityInBucket, 'quantity in bucket');
+        currentBucketData.totalPrice -= quantityInBucket * product.price;
+
+        const bucketData = await currentBucketData.save();
+
+        return ResponseHandler.handleDeleteResponse(res, {
+            message: 'Product has been removed from bucket',
+            updatedBucket: bucketData,
+        });
+    } catch (err) {
+        next(err.message);
+    }
+};
+
+export const deleteBucket = async (req, res, next) => {
+    try {
+        const userId = req.userInfo.id;
+
+        const currentBucketData = await Bucket.findOne({ userId });
+
+        currentBucketData.products = [];
+        currentBucketData.totalPrice = 0;
+
+        const bucketData = await currentBucketData.save();
+
+        return ResponseHandler.handleDeleteResponse(res, { data: bucketData });
+    } catch (err) {
+        next(err.message);
     }
 };
