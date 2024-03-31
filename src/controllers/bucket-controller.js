@@ -8,7 +8,6 @@ export const getBucket = async (req, res, next) => {
         const userId = req.userInfo.id;
 
         const bucket = await Bucket.findOne({ userId }).limit(limit).skip(skip).populate('products.productId');
-
         return ResponseHandler.handleGetResponse(res, { data: bucket });
     } catch (err) {
         next(err.message);
@@ -19,15 +18,17 @@ export const updateBucket = async (req, res, next) => {
     try {
         const { productId, quantity } = req.body;
         const userId = req.userInfo.id;
-
         const product = await Product.findById({ _id: productId });
-
         if (product.quantity < quantity) {
             return ResponseHandler.handleValidationError(res, 'Product not available in that quantity');
         }
-
-        const currentBucketData = await Bucket.findOne({ userId });
-
+        let currentBucketData = await Bucket.findOne({ userId });
+        if (!currentBucketData) {
+            currentBucketData = new Bucket({
+                userId,
+                products: [],
+            });
+        }
         const pickedProduct = currentBucketData.products.find((prod) => prod.productId.toString() === productId);
 
         if (pickedProduct) {
@@ -39,7 +40,6 @@ export const updateBucket = async (req, res, next) => {
         }
 
         const bucketData = await currentBucketData.save();
-
         return ResponseHandler.handlePostResponse(res, { data: bucketData });
     } catch (err) {
         next(err.message);
