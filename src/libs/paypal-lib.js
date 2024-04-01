@@ -8,35 +8,48 @@ paypal.configure({
 });
 
 const pay = async (bucket) => {
+
+    console.log(bucket,'bucket')
+
     const create_payment_json = {
         intent: 'sale',
         payer: {
             payment_method: 'paypal',
         },
         redirect_urls: {
-            return_url: `${HOST}/${PORT}/bucket`,
-            cancel_url: `${HOST}/${PORT}/bucket`,
+            "return_url": "http://return.url",
+            "cancel_url": "http://cancel.url"
         },
         transactions: [
             {
                 item_list: {
-                    items: bucket.products,
+                    "items": [{
+                        "name": 'SH100 WARM QUECHUA',
+                        "price": "5.00",
+                        "currency": "USD",
+                        "quantity": 1
+                    }],
                 },
                 amount: {
                     currency: 'USD',
-                    total: bucket.totalPrice,
+                    total: 5.00,
                 },
-                description: 'This is the payment description.',
+                description: 'New shoes',
             },
         ],
     };
 
+    console.log(create_payment_json,'create_payment_json')
+
     paypal.payment.create(create_payment_json, (payment) => {
         try {
             // what is this for?
+
+            console.log(JSON.stringify(payment,null,2),'payment')
             for (let i = 0; i < payment.links.length; i++) {
                 if (payment.links[i].rel === 'approval_url') {
-                    res.redirect(payment.links[i].href);
+                    console.log(payment.links[i].href)
+                   // res.redirect(payment.links[i].href);
                 }
             }
         } catch (error) {
@@ -44,6 +57,9 @@ const pay = async (bucket) => {
         }
     });
 };
+
+
+
 
 const success = async (PayerID, paymentId) => {
     const execute_payment_json = {
@@ -67,4 +83,4 @@ const success = async (PayerID, paymentId) => {
     });
 };
 
-export default { pay, success };
+export  { pay, success };

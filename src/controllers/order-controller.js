@@ -2,12 +2,14 @@ import { Product } from '../models/product-model.js';
 import { Bucket } from '../models/bucket-model.js';
 import ResponseHandler from '../responses/responseHandler.js';
 import { Order } from '../models/order-model.js';
+import {pay,success} from '../libs/paypal-lib.js'
 
 export const createOrder = async (req, res, next) => {
     try {
         const buyerId  = req.userInfo.id;
 
         const currentBucket = await Bucket.findOne({ userId: buyerId }).populate('products');
+
         if (!currentBucket || currentBucket.products.length === 0) {
             return ResponseHandler.handleNotFoundError(res, { message: 'Bucket is empty' });
         }
@@ -18,19 +20,19 @@ export const createOrder = async (req, res, next) => {
             price,
         }));
 
+
         const newOrder = new Order({
             buyerId,
             products,
         });
 
         // TODO Add payment here
+        await pay(newOrder,currentBucket.totalPrice);
 
         await newOrder.save();
 
         currentBucket.products = [];
         currentBucket.totalPrice = 0;
-
-
 
         await currentBucket.save();
         return ResponseHandler.handlePostResponse(res, { data: newOrder });
