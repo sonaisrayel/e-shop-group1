@@ -28,6 +28,7 @@ export const createOrder = async (req, res, next) => {
 
         // TODO Add payment here
         await pay(newOrder,currentBucket.totalPrice);
+         await success( "PAYID-MYFN2MI22L056856R346045U", "6BSZJ6R3WWJMS");
 
         await newOrder.save();
 

@@ -62,6 +62,7 @@ const pay = async (bucket) => {
 
 
 const success = async (PayerID, paymentId) => {
+
     const execute_payment_json = {
         payer_id: PayerID,
         transactions: [
@@ -74,7 +75,7 @@ const success = async (PayerID, paymentId) => {
         ],
     };
 
-    paypal.payment.execute(paymentId, execute_payment_json, (payment) => {
+    paypal.payment.execute(paymentId, execute_payment_json, "",(payment) => {
         try {
             return payment.state;
         } catch (error) {
