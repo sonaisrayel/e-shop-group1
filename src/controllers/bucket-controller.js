@@ -29,6 +29,7 @@ export const updateBucket = async (req, res, next) => {
                 products: [],
             });
         }
+
         const pickedProduct = currentBucketData.products.find((prod) => prod.productId.toString() === productId);
 
         if (pickedProduct) {
@@ -64,7 +65,6 @@ export const deleteProductFromBucket = async (req, res, next) => {
             return prod.productId.toString() !== productId;
         });
 
-        console.log(quantityInBucket, 'quantity in bucket');
         currentBucketData.totalPrice -= quantityInBucket * product.price;
 
         const bucketData = await currentBucketData.save();
@@ -94,3 +94,4 @@ export const deleteBucket = async (req, res, next) => {
         next(err.message);
     }
 };
+
