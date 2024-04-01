@@ -5,5 +5,5 @@ import { createOrder, getOrders, updateOrder } from '../controllers/order-contro
 
 router.post('/', createOrder);
 router.get('/:buyerId', getOrders);
-router.patch('/:productId', updateOrder);
+router.patch('/', updateOrder);
 export default router;
