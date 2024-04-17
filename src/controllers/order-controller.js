@@ -2,11 +2,11 @@ import { Product } from '../models/product-model.js';
 import { Bucket } from '../models/bucket-model.js';
 import ResponseHandler from '../responses/responseHandler.js';
 import { Order } from '../models/order-model.js';
-import {pay,success} from '../libs/paypal-lib.js'
+import { pay, success } from '../libs/paypal-lib.js';
 
 export const createOrder = async (req, res, next) => {
     try {
-        const buyerId  = req.userInfo.id;
+        const buyerId = req.userInfo.id;
 
         const currentBucket = await Bucket.findOne({ userId: buyerId }).populate('products');
 
@@ -20,15 +20,13 @@ export const createOrder = async (req, res, next) => {
             price,
         }));
 
-
         const newOrder = new Order({
             buyerId,
             products,
         });
 
-        // TODO Add payment here
-        await pay(newOrder,currentBucket.totalPrice);
-         await success( "PAYID-MYFN2MI22L056856R346045U", "6BSZJ6R3WWJMS");
+        await pay(newOrder, currentBucket.totalPrice);
+        await success('PAYID-MYFN2MI22L056856R346045U', '6BSZJ6R3WWJMS');
 
         await newOrder.save();
 
@@ -55,15 +53,15 @@ export const getOrders = async (req, res, next) => {
 export const updateOrder = async (req, res, next) => {
     try {
         const { userInfo } = req;
-        const { status,productId }= req.body
-        const product = await Product.findOne({ _id: productId,seller:userInfo.id});
+        const { status, productId } = req.body;
+        const product = await Product.findOne({ _id: productId, seller: userInfo.id });
         if (!product) {
             return ResponseHandler.handleNotFoundError(res, { message: 'Product not found' });
         }
 
         const orderToUpdate = await Order.findOne({ 'products.productId': productId });
 
-        console.log(orderToUpdate,'orderToUpdate')
+        console.log(orderToUpdate, 'orderToUpdate');
 
         if (!orderToUpdate) {
             return ResponseHandler.handleNotFoundError(res, { message: 'Order not found' });
