@@ -4,7 +4,13 @@
       "name": "Library",
       "script": "./src/index.js",
       "env": {
-        "PORT": "3000"
+        "PORT": "3000",
+        "MONGOURL":"mongodb+srv://agbu:cX7hVLBaWgOckIrq@cluster0.w5tklqg.mongodb.net/e-shop-one",
+        "SECRET":"bubu",
+        "ADMIN_USERNAME":"shopkeeper",
+        "ADMIN_PASSWORD":"adminShop1!",
+        "PAYPAL_CLIENT_ID":"Ab05iSDt6IqlvMZj6opPxo20CHMLuKsnv1dk8IyvA4xp7U4u_XSGK_yjwpYoFy13Y9wxmb1PH4PSPLlQ",
+        "PAYPAL_SECTRET_KEY":"EEto5VlJJamnSmdj9MPHzwr8qZwh3MNVKsmI5Efr-JABdnyFpD40H1PHgLtnIfTyPVDM_rmU7HyZ6zXP"
 
       }
     }
