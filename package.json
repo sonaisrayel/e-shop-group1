@@ -14,16 +14,21 @@
     "author": "Agbu students group-1",
     "license": "ISC",
     "dependencies": {
+        "bcrypt": "^5.1.1",
         "express": "^4.18.3",
+        "http-status-codes": "^2.3.0",
+        "joi": "^17.12.2",
         "jsonwebtoken": "^9.0.2",
-        "mongoose": "^8.2.0"
+        "mongoose": "^8.2.0",
+        "multer": "^1.4.5-lts.1",
+        "paypal-rest-sdk": "^1.8.1"
     },
     "devDependencies": {
         "dotenv": "^16.4.5",
-        "nodemon": "^3.1.0",
         "eslint": "^8.34.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-prettier": "^4.2.1",
+        "nodemon": "^3.1.0",
         "prettier": "^2.7.1"
     }
 }
