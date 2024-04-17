@@ -8,8 +8,7 @@ paypal.configure({
 });
 
 const pay = async (bucket) => {
-
-    console.log(bucket,'bucket')
+    console.log(bucket, 'bucket');
 
     const create_payment_json = {
         intent: 'sale',
@@ -17,39 +16,41 @@ const pay = async (bucket) => {
             payment_method: 'paypal',
         },
         redirect_urls: {
-            "return_url": "http://return.url",
-            "cancel_url": "http://cancel.url"
+            return_url: 'http://return.url',
+            cancel_url: 'http://cancel.url',
         },
         transactions: [
             {
                 item_list: {
-                    "items": [{
-                        "name": 'SH100 WARM QUECHUA',
-                        "price": "5.00",
-                        "currency": "USD",
-                        "quantity": 1
-                    }],
+                    items: [
+                        {
+                            name: 'SH100 WARM QUECHUA',
+                            price: '5.00',
+                            currency: 'USD',
+                            quantity: 1,
+                        },
+                    ],
                 },
                 amount: {
                     currency: 'USD',
-                    total: 5.00,
+                    total: 5.0,
                 },
                 description: 'New shoes',
             },
         ],
     };
 
-    console.log(create_payment_json,'create_payment_json')
+    console.log(create_payment_json, 'create_payment_json');
 
     paypal.payment.create(create_payment_json, (payment) => {
         try {
             // what is this for?
 
-            console.log(JSON.stringify(payment,null,2),'payment')
+            console.log(JSON.stringify(payment, null, 2), 'payment');
             for (let i = 0; i < payment.links.length; i++) {
                 if (payment.links[i].rel === 'approval_url') {
-                    console.log(payment.links[i].href)
-                   // res.redirect(payment.links[i].href);
+                    console.log(payment.links[i].href);
+                    // res.redirect(payment.links[i].href);
                 }
             }
         } catch (error) {
@@ -58,11 +59,7 @@ const pay = async (bucket) => {
     });
 };
 
-
-
-
 const success = async (PayerID, paymentId) => {
-
     const execute_payment_json = {
         payer_id: PayerID,
         transactions: [
@@ -75,7 +72,7 @@ const success = async (PayerID, paymentId) => {
         ],
     };
 
-    paypal.payment.execute(paymentId, execute_payment_json, "",(payment) => {
+    paypal.payment.execute(paymentId, execute_payment_json, '', (payment) => {
         try {
             return payment.state;
         } catch (error) {
@@ -84,4 +81,4 @@ const success = async (PayerID, paymentId) => {
     });
 };
 
-export  { pay, success };
+export { pay, success };

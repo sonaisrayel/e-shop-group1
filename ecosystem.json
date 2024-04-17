@@ -1,29 +1,28 @@
 {
-  "apps": [
-    {
-      "name": "Library",
-      "script": "./src/index.js",
-      "env": {
-        "PORT": "3000",
-        "MONGOURL":"mongodb+srv://agbu:cX7hVLBaWgOckIrq@cluster0.w5tklqg.mongodb.net/e-shop-one",
-        "SECRET":"bubu",
-        "ADMIN_USERNAME":"shopkeeper",
-        "ADMIN_PASSWORD":"adminShop1!",
-        "PAYPAL_CLIENT_ID":"Ab05iSDt6IqlvMZj6opPxo20CHMLuKsnv1dk8IyvA4xp7U4u_XSGK_yjwpYoFy13Y9wxmb1PH4PSPLlQ",
-        "PAYPAL_SECTRET_KEY":"EEto5VlJJamnSmdj9MPHzwr8qZwh3MNVKsmI5Efr-JABdnyFpD40H1PHgLtnIfTyPVDM_rmU7HyZ6zXP"
-
-      }
+    "apps": [
+        {
+            "name": "Library",
+            "script": "./src/index.js",
+            "env": {
+                "PORT": "3000",
+                "MONGOURL": "mongodb+srv://agbu:cX7hVLBaWgOckIrq@cluster0.w5tklqg.mongodb.net/e-shop-one",
+                "SECRET": "bubu",
+                "ADMIN_USERNAME": "shopkeeper",
+                "ADMIN_PASSWORD": "adminShop1!",
+                "PAYPAL_CLIENT_ID": "Ab05iSDt6IqlvMZj6opPxo20CHMLuKsnv1dk8IyvA4xp7U4u_XSGK_yjwpYoFy13Y9wxmb1PH4PSPLlQ",
+                "PAYPAL_SECTRET_KEY": "EEto5VlJJamnSmdj9MPHzwr8qZwh3MNVKsmI5Efr-JABdnyFpD40H1PHgLtnIfTyPVDM_rmU7HyZ6zXP"
+            }
+        }
+    ],
+    "deploy": {
+        "prod": {
+            "user": "root",
+            "host": "143.198.155.196",
+            "ref": "origin/master",
+            "repo": "git@github.com:sonaisrayel/e-shop-group1.git",
+            "path": "/root/project/library/",
+            "pre-deploy-local": "scp ecosystem.json root@143.198.155.196:'/root/project/library/'",
+            "post-deploy": "export NODE_OPTIONS=--max-old-space-size=30240 && npm install --silent && pm2 startOrRestart /root/project/library/ecosystem.json --env prod && rm /root/project/library/ecosystem.json"
+        }
     }
-  ],
-  "deploy": {
-    "prod": {
-      "user": "root",
-      "host": "143.198.155.196",
-      "ref": "origin/master",
-      "repo": "git@github.com:sonaisrayel/e-shop-group1.git",
-      "path": "/root/project/library/",
-      "pre-deploy-local": "scp ecosystem.json root@143.198.155.196:'/root/project/library/'",
-      "post-deploy": "export NODE_OPTIONS=--max-old-space-size=30240 && npm install --silent && pm2 startOrRestart /root/project/library/ecosystem.json --env prod && rm /root/project/library/ecosystem.json"
-    }
-  }
 }

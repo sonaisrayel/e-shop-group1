@@ -94,4 +94,3 @@ export const deleteBucket = async (req, res, next) => {
         next(err.message);
     }
 };
-
