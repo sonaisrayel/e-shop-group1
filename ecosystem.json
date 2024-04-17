@@ -1,0 +1,23 @@
+{
+  "apps": [
+    {
+      "name": "Library",
+      "script": "./src/index.js",
+      "env": {
+        "PORT": "3000"
+
+      }
+    }
+  ],
+  "deploy": {
+    "prod": {
+      "user": "root",
+      "host": "143.198.155.196",
+      "ref": "origin/master",
+      "repo": "git@github.com:sonaisrayel/e-shop-group1.git",
+      "path": "/root/project/library/",
+      "pre-deploy-local": "scp ecosystem.json root@143.198.155.196:'/root/project/library/'",
+      "post-deploy": "export NODE_OPTIONS=--max-old-space-size=30240 && npm install --silent && pm2 startOrRestart /root/project/library/ecosystem.json --env prod && rm /root/project/library/ecosystem.json"
+    }
+  }
+}
