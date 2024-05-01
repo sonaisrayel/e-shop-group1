@@ -2,8 +2,6 @@ import { Product } from '../models/product-model.js';
 import { Bucket } from '../models/bucket-model.js';
 import ResponseHandler from '../responses/responseHandler.js';
 import { Order } from '../models/order-model.js';
-import { pay, success } from '../libs/paypal-lib.js';
-
 export const createOrder = async (req, res, next) => {
     try {
         const buyerId = req.userInfo.id;
@@ -24,9 +22,6 @@ export const createOrder = async (req, res, next) => {
             buyerId,
             products,
         });
-
-        await pay(newOrder, currentBucket.totalPrice);
-        await success('PAYID-MYFN2MI22L056856R346045U', '6BSZJ6R3WWJMS');
 
         await newOrder.save();
 

@@ -19,5 +19,5 @@ router.use(isAuthorized);
 router.post('/', createProduct);
 router.delete('/:id', deleteProduct);
 router.patch('/:id', upload.single('file'), updateProduct);
-router.post('/:id/image', upload.single('file'), addProductImage);
+router.post('/image', upload.single('file'), addProductImage);
 export default router;

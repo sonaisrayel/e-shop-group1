@@ -23,7 +23,7 @@ export const createProduct = async (req, res, next) => {
 };
 export const addProductImage = async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const { id } = req.body;
         const { userInfo } = req;
         if (!req.file) {
             return ResponseHandler.handleValidationError(res, { message: 'Missing required parameters' });
